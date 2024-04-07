@@ -3,7 +3,7 @@ module.exports = {
     {
       name: "web-bot",
       cwd: "./",
-      script: "./index.mjs",
+      script: "./index.js",
       watch: true,
       env_production: {
         NODE_ENV: "production",
