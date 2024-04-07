@@ -1,0 +1,19 @@
+version: "1.1"
+
+services:
+  node:
+    container_name: web-bot
+    restart: always
+    image: node:16.10.0
+    ports:
+      - 3000:3000
+    volumes:
+      - ./:/usr/src/app
+    working_dir: /usr/src/app
+    networks:
+      - web-bot_network
+    command: bash -c "npm install && npm run start:prod"
+
+networks:
+  web-bot_network:
+    driver: bridge
