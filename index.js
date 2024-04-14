@@ -76,6 +76,26 @@ app.post("/payment", uploader_member.single("picture"), async (req, res) => {
   }
 });
 
+// app.get("/picture/:id", async (req, res) => {
+//   try {
+//     const pictureId = req.params.id;
+//     const picture = await Picture.findById(pictureId);
+
+//     if (!picture) {
+//       return res.status(404).json({ message: "Picture not found" });
+//     }
+
+//     // Send the picture data in the response
+//     res.json({
+//       data: picture.data.toString("base64"), // Send the base64-encoded picture data
+//       contentType: picture.contentType,
+//     });
+//   } catch (error) {
+//     console.error(error);
+//     res.status(500).send("Internal Server Error");
+//   }
+// });
+
 app.listen(port, () => {
   console.log(`Server is running on http://localhost:${port}`);
 });
@@ -159,14 +179,13 @@ const bootstrap = () => {
     }
   });
 };
-const sendToAnotherBot = async (data, pictureId) => {
+const sendToAnotherBot = async (data) => {
   console.log("USERDATA", data.userData);
 
   try {
-    const pictureResponse = await axios.get(
-      `http://localhost:3000/picture/${pictureId}`
-    );
-
+    const savedPicture = await Picture.findById(data.userData.pictureId);
+    console.log("saved picture", savedPicture);
+    // Customize the message to send to the other bot
     const anotherBotChatId = "1039260019";
     const anotherBotMessage = `
       New Order Details:
@@ -192,13 +211,10 @@ const sendToAnotherBot = async (data, pictureId) => {
     await anotherBot.sendMessage(anotherBotChatId, anotherBotMessage);
 
     // If a picture was found, send it to the other bot as well
-    if (pictureResponse.data) {
-      // Send the picture to another bot
-      await anotherBot.sendPhoto(
-        anotherBotChatId, // Chat ID of the other bot
-        pictureResponse.data.data, // Picture data
-        { caption: "Uploaded Picture" } // Caption for the picture
-      );
+    if (savedPicture) {
+      await anotherBot.sendPhoto(anotherBotChatId, savedPicture.data, {
+        caption: "Order Picture",
+      });
     }
   } catch (error) {
     console.error("Error sending data to another bot:", error);
